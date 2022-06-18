@@ -6,7 +6,7 @@
 	"main": "dist/app",
 	"scripts": {
 		"start": "node .",
-		"dev": "node -r ts-node/register -r dotenv/config src",
+		"dev": "node -r ts-node/register -r dotenv/config src/app",
 		"debug": "npm run clean && (echo Building... & tsc --sourcemap)",
 		"test": "npm run build && node -r dotenv/config .",
 		"build": "npm run clean && (echo Building... & tsc)",
