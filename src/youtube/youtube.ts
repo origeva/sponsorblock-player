@@ -132,8 +132,7 @@ export default class YouTube {
 		let id: string | undefined
 		if (result && result.time.diffNow('hours').as('hours') < 12) {
 			id = result.data
-		}
-		if (!id || (result && result.time.diffNow('hours').as('hours') > 12)) {
+		} else {
 			let response = await axios.get<any>(
 				encodeURI(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&eventType=none&safeSearch=none&type=playlist&q=${query}&key=${this.apiToken}`)
 			)
