@@ -10,7 +10,7 @@ import { logger } from './logger'
 
 const sessionManager = SessionManager.getInstance()
 
-const port = process.env.PORT
+const port = process.env.PORT || 80
 const app = express()
 
 type APISession = { guildId: string; currentTrack: Track | undefined; queue: Track[]; repeat: boolean; shuffle: boolean }
