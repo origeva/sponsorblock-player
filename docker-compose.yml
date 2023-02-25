@@ -1,15 +1,13 @@
 services:
   bot:
+    image: origeva/sbplayer
     build: .
-    ports:
-      - '80:8080'
-
-  db:
-    image: 'postgres'
     environment:
-      POSTGRES_PASSWORD: secret
-    volumes:
-      - pgdata:/data
-
-volumes:
-  pgdata:
+      - APPLICATION_ID=
+      - BOT_SECRET=
+      - YOUTUBE_API_TOKEN=
+      - SPOTIFY_CLIENT_ID=
+      - SPOTIFY_CLIENT_SECRET=
+      - SPOTIFY_REDIRECT_URI=
+    ports:
+      - '80:80'
