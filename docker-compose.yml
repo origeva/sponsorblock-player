@@ -1,7 +1,8 @@
 services:
-  bot:
+  sbplayer:
     image: origeva/sbplayer
     build: .
+    restart: unless-stopped
     environment:
       - APPLICATION_ID=
       - BOT_SECRET=
