@@ -9,7 +9,7 @@ import YouTube from './youtube/youtube'
 import Spotify from './spotify'
 import { downloadIds } from './server'
 import { Category } from 'sponsorblock-api'
-import { allCategories, inviteUrl, permitted, serverHostname, serverProtocol, stations } from './config'
+import { allCategories, inviteUrl, kaomojis, permitted, serverHostname, serverProtocol, stations } from './config'
 import { logger } from './logger'
 import { SessionManager } from './SessionManager'
 import { RadioManager } from './stream/Radio'
@@ -33,7 +33,7 @@ setInterval(() => {
 const dmCommandsData: ApplicationCommandData[] = [
 	{ name: 'invite', description: 'Invite me to your server!' },
 	{ name: 'site', description: `The player's website. :)` },
-	// { name: 'throw', description: 'Throws an error!' },
+	{ name: 'restart', description: 'Restart the bot.' },
 ]
 
 const guildCommandsData: ApplicationCommandData[] = [
@@ -108,6 +108,7 @@ const guildCommandsData: ApplicationCommandData[] = [
 
 export let client: Client<boolean> | undefined
 export const startBot = () => {
+	
 	client = new Client({ intents: [Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] })
 
 	client.once('ready', async (client) => {
@@ -722,11 +723,12 @@ export const startBot = () => {
 				} else if (commandName === 'site') {
 					interaction.reply(hyperlink(bold('Website'), hideLinkEmbed(serverProtocol + serverHostname)))
 					return
-				} else if (commandName === 'throw') {
+				} else if (commandName === 'restart') {
 					let id = interaction.user.id
 					if (Object.values(permitted).includes(id)) {
-						interaction.reply('(╯°□°)╯︵ ┻━┻')
-						throw new Error('Intentional error')
+						const randomKaomoji = kaomojis[Math.floor(Math.random() * kaomojis.length)]
+						await interaction.reply(`${randomKaomoji} Restarting bot`)
+						process.exit()
 					}
 					interaction.reply('Not today fella.')
 					return

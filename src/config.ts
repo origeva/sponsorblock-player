@@ -1,3 +1,4 @@
+import fs from 'fs'
 import { Category } from 'sponsorblock-api'
 import axios from 'axios'
 import { logger } from './logger'
@@ -25,6 +26,12 @@ if (!serverHostname) {
 		exports.serverHostname = res.data
 	})
 }
+
+export let kaomojis: string[]
+fs.readFile('./resources/kaomoji.txt', (err, data) => {
+	if (err) throw err
+	kaomojis = data.toString().split('\n').map((line) => line.trim()).filter((line) => line)
+})
 
 class ConfigManager {
 	private static instance: ConfigManager
