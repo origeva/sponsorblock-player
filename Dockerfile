@@ -32,6 +32,8 @@ RUN npm install
 
 COPY --from=build /app/dist dist
 
+COPY resources resources
+
 EXPOSE 80
 
 ENTRYPOINT [ "node", "." ]
