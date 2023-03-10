@@ -1,5 +1,5 @@
 import Collection from '@discordjs/collection'
-import { getVoiceConnection, VoiceConnection } from '@discordjs/voice'
+import { getVoiceConnection } from '@discordjs/voice'
 import { logger } from './logger'
 import { Listener, Session } from './Session'
 import { generateRandomString } from './util'

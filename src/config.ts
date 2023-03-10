@@ -1,19 +1,18 @@
 import fs from 'fs'
 import { Category } from 'sponsorblock-api'
 import axios from 'axios'
-import { logger } from './logger'
 
 export const allCategories: Category[] = ['interaction', 'intro', 'music_offtopic', 'outro', 'preview', 'selfpromo', 'sponsor']
 // export const allStations: string[] = ['hive365']
 
-export const stations: { [key: string]: string } = {
+export const stations: Record<string, string> = {
 	Hive365: 'http://stream.hive365.co.uk:8088/live',
 	Eco99FM: 'https://eco-live.mediacast.co.il/99fm_aac',
 }
 
 export const inviteUrl = `https://discord.com/api/oauth2/authorize?client_id=${process.env.APPLICATION_ID}&permissions=3162112&redirect_uri=https%3A%2F%2Fgithub.com%2Forigeva%2F&scope=bot%20applications.commands`
 
-export const permitted: { [key: string]: string } = {
+export const permitted: Record<string, string> = {
 	PHOENIX_ID: '298586845351116801',
 	ORI_ID: '188415501607632896',
 }

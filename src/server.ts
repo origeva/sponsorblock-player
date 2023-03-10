@@ -1,5 +1,5 @@
 import { AudioPlayerStatus } from '@discordjs/voice'
-import { Collection, TextChannel } from 'discord.js'
+import { Collection } from 'discord.js'
 import express from 'express'
 import { SessionManager } from './SessionManager'
 import { youtube } from './bot'

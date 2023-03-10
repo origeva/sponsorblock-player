@@ -5,7 +5,6 @@ import { Category } from 'sponsorblock-api'
 import { allCategories } from './config'
 import { Client } from 'discord.js'
 import { SessionManager } from './SessionManager'
-import { Readable } from 'stream'
 import { RadioStation } from './stream/Radio'
 import { logger } from './logger'
 

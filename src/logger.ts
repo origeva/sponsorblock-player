@@ -1,6 +1,5 @@
 import winston, { createLogger, format, transports } from 'winston'
 import { getTimeString } from './util'
-import fs from 'fs'
 
 winston.addColors({ debug: 'green', info: 'blue', warn: 'yellow', error: 'red' })
 
