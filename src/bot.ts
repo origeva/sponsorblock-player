@@ -106,7 +106,7 @@ const guildCommandsData: ApplicationCommandData[] = [
 	// },
 ]
 
-export let client: Client<boolean> | undefined
+export let client: Client<boolean> | null = null
 export const startBot = () => {
 	
 	client = new Client({ intents: [Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] })
@@ -728,6 +728,7 @@ export const startBot = () => {
 					if (Object.values(permitted).includes(id)) {
 						const randomKaomoji = kaomojis[Math.floor(Math.random() * kaomojis.length)]
 						await interaction.reply(`${randomKaomoji} Restarting bot`)
+						logger.info('Exiting process')
 						process.exit()
 					}
 					interaction.reply('Not today fella.')
@@ -755,6 +756,7 @@ const exitHandler = (signal: Error | NodeJS.Signals) => {
 		// 	connection.destroy()
 		// }
 		client.destroy()
+		client = null
 	}
 	process.exit()
 }
@@ -779,7 +781,7 @@ export const closeBot = () => {
 			logger.info(`Destroying ${client.guilds.resolve(connection.joinConfig.guildId)?.name}'s voice connection`)
 			connection.destroy()
 		}
-		client = undefined
+		client = null
 		return true
 	} else {
 		return false
