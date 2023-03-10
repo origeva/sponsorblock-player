@@ -9,6 +9,11 @@ import { Readable } from 'stream'
 import { RadioStation } from './stream/Radio'
 import { logger } from './logger'
 
+const networkStateChangeHandler = (oldNetworkState: any, newNetworkState: any) => {
+	const newUdp = Reflect.get(newNetworkState, 'udp');
+	clearInterval(newUdp?.keepAliveInterval);
+}
+
 export type Listener = { guildId: string; channelId: string }
 export type PlayInfo = { track: Track; eta: number }
 
@@ -38,6 +43,9 @@ export class Session {
 		// audioPlayer.on('stateChange', (oldState, newState) => {
 		// 	logger.debug                                                                                                             (`Transferred from ${oldState.status} to ${newState.status}`)
 		// })
+		audioPlayer.on('error', (err) => {
+			logger.debug(err.message)
+		})
 		audioPlayer.on(AudioPlayerStatus.Playing, () => {
 			this.clearTimeout()
 		})
@@ -172,6 +180,14 @@ export class Session {
 		let guild = await (client as Client<boolean>).guilds.fetch(listener.guildId)
 		let adapterCreator = guild.voiceAdapterCreator as DiscordGatewayAdapterCreator // ??
 		this.voiceConnection = joinVoiceChannel({ channelId: listener.channelId, guildId: listener.guildId, adapterCreator, selfMute: false, selfDeaf: false })
+		  
+		this.voiceConnection.on<'stateChange'>('stateChange', (oldState, newState) => {
+			const oldNetworking = Reflect.get(oldState, 'networking');
+			const newNetworking = Reflect.get(newState, 'networking');
+		  
+			oldNetworking?.off('stateChange', networkStateChangeHandler);
+			newNetworking?.on('stateChange', networkStateChangeHandler);
+		  });
 		this.playerSubscription = this.voiceConnection.subscribe(this.audioPlayer)
 		return this.voiceConnection
 	}
