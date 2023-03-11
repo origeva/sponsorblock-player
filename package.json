@@ -6,8 +6,8 @@
 	"main": "dist/app",
 	"scripts": {
 		"start": "node .",
-		"dev": "node -r ts-node/register -r dotenv/config src/app",
-		"debug": "npm run clean && (echo Building... & tsc --sourcemap)",
+		"dev": "node -r dotenv/config .",
+		"debug": "npm run clean && (echo Building... & tsc --sourcemap) && node -r dotenv/config .",
 		"test": "npm run build && node -r dotenv/config .",
 		"build": "npm run clean && (echo Building... & tsc)",
 		"clean": "echo Cleaning... & rd /s /q \"./dist\" & exit",
@@ -22,19 +22,19 @@
 	"author": "Ori Geva",
 	"license": "ISC",
 	"dependencies": {
-		"@discordjs/builders": "^0.8.2",
-		"@discordjs/voice": "^0.7.5",
+		"@discordjs/voice": "^0.14.0",
 		"axios": "^0.24.0",
-		"discord.js": "^13.3.1",
+		"discord.js": "^14.7.1",
 		"express": "^4.17.1",
 		"ffmpeg-static": "^4.4.0",
-		"libsodium-wrappers": "^0.7.9",
+		"libsodium-wrappers": "^0.7.11",
 		"lodash": "^4.17.21",
 		"luxon": "^2.1.1",
 		"passport": "^0.5.0",
 		"socket.io": "^4.4.0",
 		"sponsorblock-api": "^0.2.2",
 		"spotify-web-api-node": "^5.0.2",
+		"typescript": "^4.9.5",
 		"winston": "^3.3.3",
 		"ytdl-core": "^4.9.1"
 	},
@@ -43,10 +43,9 @@
 		"@types/ffmpeg-static": "^3.0.0",
 		"@types/lodash": "^4.14.176",
 		"@types/luxon": "^2.0.7",
+		"@types/node": "^18.15.0",
 		"@types/passport": "^1.0.7",
 		"@types/spotify-web-api-node": "^5.0.3",
-		"dotenv": "^10.0.0",
-		"nodemon": "^2.0.12",
-		"ts-node": "^10.2.0"
+		"dotenv": "^10.0.0"
 	}
 }

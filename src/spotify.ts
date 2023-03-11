@@ -1,4 +1,4 @@
-import Collection from '@discordjs/collection'
+import { Collection } from 'discord.js'
 import SpotifyWebApi from 'spotify-web-api-node'
 import { logger } from './logger'
 import { isURL } from './util'

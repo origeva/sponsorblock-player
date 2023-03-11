@@ -1,7 +1,6 @@
-import { ApplicationCommandData, Client, Collection, GuildMember, Intents } from 'discord.js'
+import { ApplicationCommandData, Client, Collection, GuildMember, GatewayIntentBits, OAuth2Guild, ApplicationCommandOptionType, ChannelType, bold, hideLinkEmbed, hyperlink, inlineCode } from 'discord.js'
 import { getVoiceConnection, getVoiceConnections, AudioPlayerStatus } from '@discordjs/voice'
 import ytdl from 'ytdl-core'
-import { bold, hideLinkEmbed, hyperlink, inlineCode } from '@discordjs/builders'
 import { StreamOptions } from './Track'
 import { generateRandomString, isURL, stringToTimeInSeconds } from './util'
 import { booleanToString, secondsToString, styleStatus, styleTrack, styleUrl } from './style'
@@ -38,14 +37,14 @@ const dmCommandsData: ApplicationCommandData[] = [
 
 const guildCommandsData: ApplicationCommandData[] = [
 	// Guild
-	{ name: 'play', description: 'Plays music.', options: [{ name: 'query', type: 'STRING', description: 'YouTube search query, URL or Spotify URL.', required: true }] },
+	{ name: 'play', description: 'Plays music.', options: [{ name: 'query', type: ApplicationCommandOptionType.String, description: 'YouTube search query, URL or Spotify URL.', required: true }] },
 	{
 		name: 'radio',
 		description: 'Play radio streams! Omit station to stop playing the radio.',
 		options: [
 			{
 				name: 'station',
-				type: 'STRING',
+				type: ApplicationCommandOptionType.String,
 				description: 'Station to listen to.',
 				choices: Object.keys(stations).map((station) => {
 					return { name: station, value: station }
@@ -53,24 +52,24 @@ const guildCommandsData: ApplicationCommandData[] = [
 			},
 		],
 	},
-	{ name: 'playlist', description: 'Plays a YouTube playlist.', options: [{ name: 'query', type: 'STRING', description: 'Playlist link or search query.', required: true }] },
+	{ name: 'playlist', description: 'Plays a YouTube playlist.', options: [{ name: 'query', type: ApplicationCommandOptionType.String, description: 'Playlist link or search query.', required: true }] },
 	{
 		name: 'join',
 		description: `Joins the voice channel you're in.`,
-		options: [{ name: 'channel', type: 'CHANNEL', channelTypes: ['GUILD_VOICE', 'GUILD_STAGE_VOICE'], description: 'Channel to join to.' }],
+		options: [{ name: 'channel', type: ApplicationCommandOptionType.Channel, channelTypes: [ChannelType.GuildVoice, ChannelType.GuildStageVoice], description: 'Channel to join to.' }],
 	},
 	// Session
 	{ name: 'disconnect', description: 'Disconnects from the voice channel.' },
 	{
 		name: 'move',
 		description: `Moves to the voice channel you're in.`,
-		options: [{ name: 'channel', type: 'CHANNEL', channelTypes: ['GUILD_VOICE', 'GUILD_STAGE_VOICE'], description: 'Channel to move to.' }],
+		options: [{ name: 'channel', type: ApplicationCommandOptionType.Channel, channelTypes: [ChannelType.GuildVoice, ChannelType.GuildStageVoice], description: 'Channel to move to.' }],
 	},
 	{ name: 'current', description: 'Displays current track.' },
-	{ name: 'queue', description: 'Displays queue.', options: [{ name: 'expand', type: 'BOOLEAN', description: 'Whether the queue should display all pages.' }] },
+	{ name: 'queue', description: 'Displays queue.', options: [{ name: 'expand', type: ApplicationCommandOptionType.Boolean, description: 'Whether the queue should display all pages.' }] },
 	// Same channel
-	{ name: 'remove', description: 'Removes track from queue.', options: [{ name: 'index', type: 'INTEGER', description: 'Index of the track in the queue.', required: true }] },
-	{ name: 'skip', description: 'Skips tracks.', options: [{ name: 'amount', type: 'INTEGER', description: 'Amount of tracks to skip (defaults to 1).' }] },
+	{ name: 'remove', description: 'Removes track from queue.', options: [{ name: 'index', type: ApplicationCommandOptionType.Integer, description: 'Index of the track in the queue.', required: true }] },
+	{ name: 'skip', description: 'Skips tracks.', options: [{ name: 'amount', type: ApplicationCommandOptionType.Integer, description: 'Amount of tracks to skip (defaults to 1).' }] },
 	{ name: 'fs', description: 'Force skip current track.' },
 	{ name: 'pause', description: 'Pause current track.' },
 	{ name: 'resume', description: 'Resumes current track.' },
@@ -83,7 +82,7 @@ const guildCommandsData: ApplicationCommandData[] = [
 		options: [
 			{
 				name: 'category',
-				type: 'STRING',
+				type: ApplicationCommandOptionType.String,
 				description: 'The category to toggle the skipping of.',
 				choices: allCategories.map((category) => {
 					return { name: category, value: category }
@@ -95,21 +94,21 @@ const guildCommandsData: ApplicationCommandData[] = [
 	{
 		name: 'seek',
 		description: 'Seeks to specific time in current track.',
-		options: [{ name: 'timestamp', type: 'STRING', description: 'Timestamp format: hh:mm:ss (e.g. 19:03)', required: true }],
+		options: [{ name: 'timestamp', type: ApplicationCommandOptionType.String, description: 'Timestamp format: hh:mm:ss (e.g. 19:03)', required: true }],
 	},
 	{ name: 'replay', description: 'Replays current track.' },
 	{ name: 'download', description: 'Generate download link for the current song.' },
 	// {
 	// 	name: 'together',
 	// 	description: 'Generate a code to join the same session on a different server.',
-	// 	options: [{ name: 'code', type: 'STRING', description: 'The join code (Omit if you want to generate a code)' }],
+	// 	options: [{ name: 'code', type: ApplicationCommandOptionType.String, description: 'The join code (Omit if you want to generate a code)' }],
 	// },
 ]
 
 export let client: Client<boolean> | null = null
 export const startBot = () => {
 	
-	client = new Client({ intents: [Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] })
+	client = new Client({ intents: [GatewayIntentBits.DirectMessages, GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] })
 
 	client.once('ready', async (client) => {
 		logger.info(`${client.user.username} ready!`)
@@ -149,7 +148,7 @@ export const startBot = () => {
 
 	client.on('interactionCreate', async (interaction) => {
 		try {
-			if (interaction.isCommand()) {
+			if (interaction.isChatInputCommand()) {
 				if (interaction.user.bot) {
 					interaction.reply(`I don't talk with other bots at the moment. :/`)
 					return
@@ -349,7 +348,7 @@ export const startBot = () => {
 							return
 						}
 						let channel = interaction.options.getChannel('channel')
-						if (channel && channel.type !== 'GUILD_VOICE' && channel.type !== 'GUILD_STAGE_VOICE') {
+						if (channel && channel.type !== ChannelType.GuildVoice && channel.type !== ChannelType.GuildStageVoice) {
 							interaction.reply(`You have to choose a ${bold('voice')} channel.`)
 							return
 						}
@@ -735,7 +734,7 @@ export const startBot = () => {
 					return
 				}
 			} else {
-				if (interaction.channel?.type === 'DM') {
+				if (interaction.channel?.type === ChannelType.DM) {
 					interaction.channel.send(`Try using one of my '/' commands.`)
 				}
 			}

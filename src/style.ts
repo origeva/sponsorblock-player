@@ -1,4 +1,4 @@
-import { bold, hyperlink, hideLinkEmbed as hide, quote, italic } from '@discordjs/builders'
+import { bold, hyperlink, hideLinkEmbed as hide, quote, italic } from 'discord.js'
 import { TrackData } from './Track'
 
 /**

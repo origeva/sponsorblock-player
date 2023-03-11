@@ -1,4 +1,4 @@
-import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, DiscordGatewayAdapterCreator, joinVoiceChannel, PlayerSubscription, VoiceConnection } from '@discordjs/voice'
+import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, joinVoiceChannel, PlayerSubscription, VoiceConnection } from '@discordjs/voice'
 import { StreamOptions, Track, TrackData } from './Track'
 import { client } from './bot'
 import { Category } from 'sponsorblock-api'
@@ -177,16 +177,16 @@ export class Session {
 		logger.info('joined voice channel')
 		this.setTimeout()
 		let guild = await (client as Client<boolean>).guilds.fetch(listener.guildId)
-		let adapterCreator = guild.voiceAdapterCreator as DiscordGatewayAdapterCreator // ??
+		let adapterCreator = guild.voiceAdapterCreator
 		this.voiceConnection = joinVoiceChannel({ channelId: listener.channelId, guildId: listener.guildId, adapterCreator, selfMute: false, selfDeaf: false })
 		  
-		this.voiceConnection.on<'stateChange'>('stateChange', (oldState, newState) => {
-			const oldNetworking = Reflect.get(oldState, 'networking');
-			const newNetworking = Reflect.get(newState, 'networking');
+		this.voiceConnection.on('stateChange', (oldState, newState) => {
+			const oldNetworking = Reflect.get(oldState, 'networking')
+			const newNetworking = Reflect.get(newState, 'networking')
 		  
-			oldNetworking?.off('stateChange', networkStateChangeHandler);
-			newNetworking?.on('stateChange', networkStateChangeHandler);
-		  });
+			oldNetworking?.off('stateChange', networkStateChangeHandler)
+			newNetworking?.on('stateChange', networkStateChangeHandler)
+		})
 		this.playerSubscription = this.voiceConnection.subscribe(this.audioPlayer)
 		return this.voiceConnection
 	}
