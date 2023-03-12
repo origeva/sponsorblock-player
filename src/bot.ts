@@ -69,8 +69,8 @@ const guildCommandsData: ApplicationCommandData[] = [
 	{ name: 'queue', description: 'Displays queue.', options: [{ name: 'expand', type: ApplicationCommandOptionType.Boolean, description: 'Whether the queue should display all pages.' }] },
 	// Same channel
 	{ name: 'volume', description: 'Set volume level.', options: [{ name: 'level', type: ApplicationCommandOptionType.Integer, minValue: 0, maxValue: 100, description: 'Volume level (in %).' }] },
-	{ name: 'remove', description: 'Removes track from queue.', options: [{ name: 'index', type: ApplicationCommandOptionType.Integer, description: 'Index of the track in the queue.', required: true }] },
-	{ name: 'skip', description: 'Skips tracks.', options: [{ name: 'amount', type: ApplicationCommandOptionType.Integer, description: 'Amount of tracks to skip (defaults to 1).' }] },
+	{ name: 'remove', description: 'Removes track from queue.', options: [{ name: 'index', type: ApplicationCommandOptionType.Integer, minValue: 1, description: 'Index of the track in the queue.', required: true }] },
+	{ name: 'skip', description: 'Skips tracks.', options: [{ name: 'amount', type: ApplicationCommandOptionType.Integer, minValue: 1, description: 'Amount of tracks to skip (defaults to 1).' }] },
 	{ name: 'fs', description: 'Force skip current track.' },
 	{ name: 'pause', description: 'Pause current track.' },
 	{ name: 'resume', description: 'Resumes current track.' },
