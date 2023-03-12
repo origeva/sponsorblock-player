@@ -68,6 +68,7 @@ const guildCommandsData: ApplicationCommandData[] = [
 	{ name: 'current', description: 'Displays current track.' },
 	{ name: 'queue', description: 'Displays queue.', options: [{ name: 'expand', type: ApplicationCommandOptionType.Boolean, description: 'Whether the queue should display all pages.' }] },
 	// Same channel
+	{ name: 'volume', description: 'Set volume level.', options: [{ name: 'level', type: ApplicationCommandOptionType.Integer, minValue: 0, maxValue: 100, description: 'Volume level (in %).' }] },
 	{ name: 'remove', description: 'Removes track from queue.', options: [{ name: 'index', type: ApplicationCommandOptionType.Integer, description: 'Index of the track in the queue.', required: true }] },
 	{ name: 'skip', description: 'Skips tracks.', options: [{ name: 'amount', type: ApplicationCommandOptionType.Integer, description: 'Amount of tracks to skip (defaults to 1).' }] },
 	{ name: 'fs', description: 'Force skip current track.' },
@@ -466,6 +467,26 @@ export const startBot = () => {
 						} else {
 							interaction.reply(`SponsorBlock enabled categories:\n${session.categories.map((category) => inlineCode(category)).join('\n')}`)
 						}
+						return
+					} else if (commandName === 'volume') {
+						let channelId = (interaction.member as GuildMember).voice.channelId
+						let session = sessionManager.sessions.get(guildId)
+						if (!session) {
+							interaction.reply(`There's nothing playing at the moment.`)
+							return
+						}
+						if (channelId !== session.voiceChannelId) {
+							interaction.reply(`You have to be in the bot's channel for this command`)
+							return
+						}
+						let level = interaction.options.getInteger('level')
+						if (level) {
+							session.setVolume(level / 100)
+							interaction.reply(`Volume set to ${level}%.`)
+							return
+						}
+						level = session.getVolume() * 100
+						interaction.reply(`Current volume is on ${level}%`)
 						return
 					} else if (commandName === 'remove') {
 						let channelId = (interaction.member as GuildMember).voice.channelId

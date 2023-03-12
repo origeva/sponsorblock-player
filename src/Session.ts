@@ -1,4 +1,4 @@
-import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, joinVoiceChannel, PlayerSubscription, VoiceConnection } from '@discordjs/voice'
+import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, joinVoiceChannel, PlayerSubscription, VoiceConnection } from '@discordjs/voice'
 import { StreamOptions, Track, TrackData } from './Track'
 import { client } from './bot'
 import { Category } from 'sponsorblock-api'
@@ -29,6 +29,8 @@ export class Session {
 	public repeat: boolean = false
 	public shuffle: boolean = false
 	public currentTrack: Track | undefined
+	private currentResource: AudioResource<Track> | null = null
+	private volume: number = 1
 	public currentTrackEndDate: Date | undefined
 	public queueTime: number = 0
 	public queue: Track[] = []
@@ -101,7 +103,9 @@ export class Session {
 			track.currentLength -= skipSegments.map((segment) => segment.endTime - segment.startTime).reduce((prev, current) => prev + current)
 			options.skipSegments = skipSegments
 		}
-		this.audioPlayer.play(await track.createAudioResource(options))
+		this.currentResource = await track.createAudioResource(options)
+		this.currentResource.volume?.setVolume(this.volume)
+		this.audioPlayer.play(this.currentResource)
 		this.currentTrack = track
 		this.currentTrackEndDate = new Date(new Date().getTime() + track.currentLength * 1000)
 	}
@@ -134,6 +138,15 @@ export class Session {
 			this.playerSubscription.unsubscribe()
 			this.playerSubscription = connection.subscribe(this.audioPlayer)
 		}
+	}
+
+	public setVolume(level: number) {
+		this.volume = level
+		this.currentResource?.volume?.setVolume(level)
+	}
+
+	public getVolume(): number {
+		return this.volume
 	}
 
 	public async addTrack(trackData: TrackData): Promise<PlayInfo> {

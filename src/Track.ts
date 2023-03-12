@@ -60,7 +60,7 @@ export class Track implements TrackData {
 	 */
 	public async createAudioResource(options?: StreamOptions): Promise<AudioResource<Track>> {
 		let probe = await demuxProbe(this.createAudioStream(options))
-		return createAudioResource(probe.stream, { metadata: this, inputType: probe.type })
+		return createAudioResource(probe.stream, { metadata: this, inputType: probe.type, inlineVolume: true })
 	}
 
 	/**
