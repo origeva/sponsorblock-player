@@ -1,14 +1,14 @@
 import cp from 'child_process'
 import ffmpeg from 'ffmpeg-static'
 import { Segment } from 'sponsorblock-api'
-import { Readable } from 'stream'
+import { Duplex, Readable } from 'stream'
 
 export type ContainerType = 'webm' | 'opus' | 'mp3'
 
-export function trimSegmentsAudio(input: Readable, segments: (Segment | { startTime: number; endTime: number })[], container: ContainerType): Readable {
-	if (!segments.length) {
-		return input
-	}
+export function trimSegmentsAudio(segments: (Segment | { startTime: number; endTime: number })[], container: ContainerType): Duplex {
+	// if (!segments.length) {
+	// 	return input
+	// }
 	let filter = ''
 	if (segments) {
 		let pos = 0
@@ -44,19 +44,10 @@ export function trimSegmentsAudio(input: Readable, segments: (Segment | { startT
 			'pipe:1',
 		],
 		{
-			stdio: [input, 'pipe', 'ignore'],
+			stdio: ['pipe', 'pipe', 'ignore'],
 		}
 	)
-
-	// Link streams
-	// input.pipe(ffmpegProcess.stdin)
-	let output = ffmpegProcess.stdout
-	output.on('close', () => {
-		ffmpegProcess.kill()
-		input.destroy()
-	})
-
-	return output
+	return Duplex.from({ writable: ffmpegProcess.stdin, readable: ffmpegProcess.stdout })
 }
 
 export function seekAudio(input: Readable, seek: number = 0): Readable {

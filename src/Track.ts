@@ -78,7 +78,7 @@ export class Track implements TrackData {
 				neededSegments = [{ startTime: 0, endTime }, ...neededSegments]
 			}
 			if (neededSegments.length) {
-				stream = trimSegmentsAudio(stream, neededSegments, options.container)
+				stream = stream.pipe(trimSegmentsAudio(neededSegments, options.container))
 			}
 		}
 		return stream
