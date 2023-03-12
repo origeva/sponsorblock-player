@@ -6,14 +6,14 @@ import { Readable } from 'stream'
 
 export class RadioManager {
 	private static instance: RadioManager
-	private radioStations: Map<string, RadioStation> = new Map<string, RadioStation>()
+	private radioStations: Map<keyof typeof stations, RadioStation> = new Map()
 	private constructor() {}
 
 	public static getInstance(): RadioManager {
 		return this.instance || (this.instance = new RadioManager())
 	}
 
-	public async getRadioStation(stationName: string): Promise<RadioStation> {
+	public async getRadioStation(stationName: keyof typeof stations): Promise<RadioStation> {
 		let station = this.radioStations.get(stationName)
 		let url = stations[stationName]
 		if (!station) {
@@ -44,14 +44,14 @@ export class RadioManager {
 }
 
 export class RadioStation extends AudioPlayer {
-	public readonly stationName: string
+	public readonly stationName: keyof typeof stations
 	private playerSubscriptions: Set<PlayerSubscription> = new Set<PlayerSubscription>()
 	public readonly url: string
 	public readonly siteUrl: string
 	private timeoutTime: number = 10 * 1000
 	private timeout: NodeJS.Timeout
 
-	constructor(stationName: string, url: string, audioResource: AudioResource, siteUrl: string, options?: CreateAudioPlayerOptions) {
+	constructor(stationName: keyof typeof stations, url: string, audioResource: AudioResource, siteUrl: string, options?: CreateAudioPlayerOptions) {
 		super(options)
 		this.stationName = stationName
 		this.url = url
@@ -63,8 +63,6 @@ export class RadioStation extends AudioPlayer {
 		})
 		this.on('unsubscribe', (subscription) => {
 			this.playerSubscriptions.delete(subscription)
-		})
-		this.on('unsubscribe', () => {
 			if (this.playerSubscriptionCount === 0) {
 				this.setTimeout()
 			}

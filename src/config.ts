@@ -5,7 +5,7 @@ import axios from 'axios'
 export const allCategories: Category[] = ['interaction', 'intro', 'music_offtopic', 'outro', 'preview', 'selfpromo', 'sponsor']
 // export const allStations: string[] = ['hive365']
 
-export const stations: Record<string, string> = {
+export const stations = {
 	Hive365: 'http://stream.hive365.co.uk:8088/live',
 	Eco99FM: 'https://eco-live.mediacast.co.il/99fm_aac',
 }
