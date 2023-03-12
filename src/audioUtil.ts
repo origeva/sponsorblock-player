@@ -1,14 +1,14 @@
 import cp from 'child_process'
 import ffmpeg from 'ffmpeg-static'
 import { Segment } from 'sponsorblock-api'
-import { Duplex, Readable } from 'stream'
+import { Duplex, PassThrough, Readable } from 'stream'
 
 export type ContainerType = 'webm' | 'opus' | 'mp3'
 
 export function trimSegmentsAudio(segments: (Segment | { startTime: number; endTime: number })[], container: ContainerType): Duplex {
-	// if (!segments.length) {
-	// 	return input
-	// }
+	if (!segments.length) {
+		return new PassThrough()
+	}
 	let filter = ''
 	if (segments) {
 		let pos = 0
