@@ -33,7 +33,7 @@
 		"luxon": "^2.1.1",
 		"passport": "^0.5.0",
 		"socket.io": "^4.4.0",
-		"sponsorblock-api": "^0.2.2",
+		"sponsorblock-api": "^0.2.3",
 		"spotify-web-api-node": "^5.0.2",
 		"typescript": "^4.9.5",
 		"winston": "^3.3.3",
