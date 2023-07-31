@@ -1,29 +1,58 @@
 import { AudioPlayerStatus } from '@discordjs/voice'
 import { Collection } from 'discord.js'
-import express from 'express'
-import { SessionManager } from './SessionManager'
-import { youtube } from './bot'
-import { StreamOptions, Track } from './Track'
+import express, { NextFunction, Request, Response } from 'express'
+import { SessionManager } from '../SessionManager'
+import { youtube } from '../bot'
+import { StreamOptions, Track } from '../Track'
 import { Server, createServer } from 'http'
 import {} from 'passport'
-import { logger } from './logger'
+import { logger } from '../logger'
+import { sessions } from './LoginService'
+import cors from 'cors'
+import crypto from 'crypto'
 
 const sessionManager = SessionManager.getInstance()
 
 const port = process.env.PORT || 80
 const app = express()
+app.use(express.json())
 
 type APISession = { guildId: string; currentTrack: Track | undefined; queue: Track[]; repeat: boolean; shuffle: boolean }
 
 export const downloadIds = new Collection<string, { track: Track; options?: StreamOptions }>()
 
+app.use(cors())
 app.use(express.static('./resources/static'))
 
 app.get('/', (req, res) => {
 	res.send(`The site isn't ready just yet :(`)
 })
 
-app.get('/download/:downloadId', (req, res) => {
+function verifySession(req: Request, res: Response, next: NextFunction) {
+	try {
+		const token = req.header('Authorization')?.split('Bearer ')[1].trim()
+		if (token) {
+			const user = sessions.get(token)
+			req.user = user
+			next()
+		}
+	} catch (err) { }
+	res.sendStatus(401)
+}
+
+app.post('/login', cors(), (req, res) => {
+	const user = req.body
+	if (user.username === 'ori' && user.password === '123') {
+		let token = crypto.randomUUID()
+		sessions.set(token, user)
+		res.setHeader('Authorization', `Bearer ${token}`)
+		res.sendStatus(200)
+	} else {
+		res.sendStatus(403)
+	}
+})
+
+app.get('/api/download/:downloadId', (req, res) => {
 	let { track, options } = downloadIds.get(req.params.downloadId) || {}
 	if (track) {
 		// res.header(`Content-Disposition', 'attachment; filename="${track.title}"`)
@@ -34,7 +63,7 @@ app.get('/download/:downloadId', (req, res) => {
 	}
 })
 
-app.get('/download/:downloadId/webm', (req, res) => {
+app.get('/api/download/:downloadId/webm', (req, res) => {
 	let { track, options } = downloadIds.get(req.params.downloadId) || {}
 	if (track) {
 		// res.header(`Content-Disposition', 'attachment; filename="${track.title}"`)
@@ -45,7 +74,7 @@ app.get('/download/:downloadId/webm', (req, res) => {
 	}
 })
 
-app.get('/sessions', (req, res) => {
+app.get('/api/sessions', verifySession, (req, res) => {
 	res.json(
 		sessionManager.sessions.map((session) => {
 			return { guildId: session.guildId, currentTrack: session.currentTrack, repeat: session.repeat, shuffle: session.shuffle }
