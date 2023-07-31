@@ -7,10 +7,10 @@ import { StreamOptions, Track } from '../Track'
 import { Server, createServer } from 'http'
 import {} from 'passport'
 import { logger } from '../logger'
-import { sessions } from './LoginService'
+import { AuthenticationService } from './AuthenticationService'
 import cors from 'cors'
-import crypto from 'crypto'
 
+const authenticationService = AuthenticationService.getInstance()
 const sessionManager = SessionManager.getInstance()
 
 const port = process.env.PORT || 80
@@ -31,9 +31,7 @@ app.get('/', (req, res) => {
 function verifySession(req: Request, res: Response, next: NextFunction) {
 	try {
 		const token = req.header('Authorization')?.split('Bearer ')[1].trim()
-		if (token) {
-			const user = sessions.get(token)
-			req.user = user
+		if (token && authenticationService.authorize(token)) {
 			next()
 		}
 	} catch (err) { }
@@ -41,10 +39,9 @@ function verifySession(req: Request, res: Response, next: NextFunction) {
 }
 
 app.post('/login', cors(), (req, res) => {
-	const user = req.body
-	if (user.username === 'ori' && user.password === '123') {
-		let token = crypto.randomUUID()
-		sessions.set(token, user)
+	const { username, password } = req.body
+	const token = authenticationService.login(username, password)
+	if (token) {
 		res.setHeader('Authorization', `Bearer ${token}`)
 		res.sendStatus(200)
 	} else {
