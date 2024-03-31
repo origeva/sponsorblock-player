@@ -245,7 +245,7 @@ export const startBot = () => {
 							interaction.reply(`You have to be in the bot's channel for this command`)
 							return
 						}
-						let stationName = interaction.options.getString('station') as keyof typeof stations
+						let stationName = interaction.options.getString('station')
 						if (!stationName) {
 							if (session) {
 								if (session.radioPlaying) {

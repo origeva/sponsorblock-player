@@ -1,0 +1,23 @@
+{
+  "stations": [
+    {
+      "name": "Hive365",
+      "siteUrl": "https://hive365.radio/",
+      "streamUrl": "http://stream.hive365.co.uk:8088/live"
+    },
+    {
+      "name": "Eco99FM",
+      "siteUrl": "https://eco99fm.maariv.co.il/",
+      "streamUrl": "https://eco-live.mediacast.co.il/99fm_aac"
+    },
+    {
+      "name": "103FM",
+      "siteUrl": "https://103fm.maariv.co.il/",
+      "streamUrl": "https://cdn.cybercdn.live/103FM/Live/icecast.audio"
+    }
+  ],
+  "permitted": {
+    "PHOENIX_ID": "298586845351116801",
+    "ORI_ID": "188415501607632896"
+  }
+}

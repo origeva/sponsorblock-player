@@ -1,23 +1,23 @@
 import { AudioPlayer, AudioResource, CreateAudioPlayerOptions, createAudioResource, demuxProbe, PlayerSubscription } from '@discordjs/voice'
 import axios from 'axios'
-import { stations } from '../config'
+import { StationInfo, stations } from '../config'
 import { logger } from '../logger'
 import { Readable } from 'stream'
 
 export class RadioManager {
 	private static instance: RadioManager
-	private radioStations: Map<keyof typeof stations, RadioStation> = new Map()
+	private radioStations: Map<string, RadioStation> = new Map()
 	private constructor() {}
 
 	public static getInstance(): RadioManager {
 		return this.instance || (this.instance = new RadioManager())
 	}
 
-	public async getRadioStation(stationName: keyof typeof stations): Promise<RadioStation> {
+	public async getRadioStation(stationName: string): Promise<RadioStation> {
 		let station = this.radioStations.get(stationName)
-		let url = stations[stationName]
+		let stationInfo = (stations.find((stationInfo) => stationInfo.name === stationName)) as StationInfo
 		if (!station) {
-			let res = await axios.get<Readable>(url, {
+			let res = await axios.get<Readable>(stationInfo.streamUrl, {
 				responseType: 'stream',
 			})
 			// logger.debug(
@@ -28,7 +28,7 @@ export class RadioManager {
 			let stream = res.data
 			let probe = await demuxProbe(stream)
 			let audioResource = createAudioResource(probe.stream, { metadata: this, inputType: probe.type })
-			station = new RadioStation(stationName, url, audioResource, res.headers['icy-url'])
+			station = new RadioStation(stationName, stationInfo.streamUrl, audioResource, stationInfo.siteUrl)
 			logger.debug(`${stationName} was created`)
 			this.radioStations.set(stationName, station)
 		}
@@ -44,17 +44,17 @@ export class RadioManager {
 }
 
 export class RadioStation extends AudioPlayer {
-	public readonly stationName: keyof typeof stations
+	public readonly stationName: string
 	private playerSubscriptions: Set<PlayerSubscription> = new Set<PlayerSubscription>()
-	public readonly url: string
+	public readonly streamUrl: string
 	public readonly siteUrl: string
 	private timeoutTime: number = 10 * 1000
 	private timeout: NodeJS.Timeout
 
-	constructor(stationName: keyof typeof stations, url: string, audioResource: AudioResource, siteUrl: string, options?: CreateAudioPlayerOptions) {
+	constructor(stationName: string, streamUrl: string, audioResource: AudioResource, siteUrl: string, options?: CreateAudioPlayerOptions) {
 		super(options)
 		this.stationName = stationName
-		this.url = url
+		this.streamUrl = streamUrl
 		this.play(audioResource)
 		this.siteUrl = siteUrl
 		this.on('subscribe', (subscription) => {
