@@ -34,6 +34,8 @@ COPY --from=build /app/dist dist
 
 COPY resources resources
 
+COPY config.json config.json
+
 EXPOSE 80
 
 ENTRYPOINT [ "node", "." ]
