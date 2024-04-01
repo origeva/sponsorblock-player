@@ -15,7 +15,7 @@ export class RadioManager {
 
 	public async getRadioStation(stationName: string): Promise<RadioStation> {
 		let station = this.radioStations.get(stationName)
-		let stationInfo = (stations.find((stationInfo) => stationInfo.name === stationName)) as StationInfo
+		let stationInfo = stations.get(stationName) as StationInfo
 		if (!station) {
 			let res = await axios.get<Readable>(stationInfo.streamUrl, {
 				responseType: 'stream',

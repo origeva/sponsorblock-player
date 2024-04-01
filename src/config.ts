@@ -9,7 +9,7 @@ export type StationInfo = { name: string, siteUrl: string, streamUrl: string }
 export const allCategories: Category[] = ['interaction', 'intro', 'music_offtopic', 'outro', 'preview', 'selfpromo', 'sponsor']
 // export const allStations: string[] = ['hive365']
 
-export let stations: StationInfo[]
+export let stations: Map<string, StationInfo>
 
 export const inviteUrl = `https://discord.com/api/oauth2/authorize?client_id=${process.env.APPLICATION_ID}&permissions=3162112&redirect_uri=https%3A%2F%2Fgithub.com%2Forigeva%2F&scope=bot%20applications.commands`
 
@@ -35,7 +35,7 @@ program.name('music-player')
 .action(({ config }) => {
 	try {
 		let configObj: { stations: StationInfo[], permitted: Record<string, string> } = JSON.parse(readFileSync(config).toString())
-		stations = configObj.stations
+		stations = new Map(configObj.stations.map((stationInfo) => ([stationInfo.name, stationInfo])))
 		permitted = configObj.permitted
 	} catch (err) {
 		if (err.code === 'ENOENT') {

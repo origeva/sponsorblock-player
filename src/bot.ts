@@ -50,8 +50,8 @@ const guildCommandsData: ApplicationCommandData[] = [
 				name: 'station',
 				type: ApplicationCommandOptionType.String,
 				description: 'Station to listen to.',
-				choices: Object.keys(stations).map((station) => {
-					return { name: station, value: station }
+				choices: Array.from(stations.keys()).map((stationName) => {
+					return { name: stationName, value: stationName }
 				}),
 			},
 		],
@@ -260,7 +260,7 @@ export const startBot = () => {
 								}
 							}
 							interaction.reply(
-								`Available stations are:\n${Object.keys(stations)
+								`Available stations are:\n${Array.from(stations.keys())
 									.map((station) => inlineCode(station))
 									.join('\n')}`
 							)
