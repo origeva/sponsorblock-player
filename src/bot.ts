@@ -37,7 +37,11 @@ const dmCommandsData: ApplicationCommandData[] = [
 
 const guildCommandsData: ApplicationCommandData[] = [
 	// Guild
-	{ name: 'play', description: 'Plays music.', options: [{ name: 'query', type: ApplicationCommandOptionType.String, description: 'YouTube search query, URL or Spotify URL.', required: true }] },
+	{ name: 'play', description: 'Plays music.', options: [
+			{ name: 'query', type: ApplicationCommandOptionType.String, description: 'YouTube search query, URL or Spotify URL.', required: true },
+			{ name: 'index', type: ApplicationCommandOptionType.Integer, description: 'Push the track into the middle of the queue (1 to play next).' }
+		]
+	},
 	{
 		name: 'radio',
 		description: 'Play radio streams! Omit station to stop playing the radio.',
@@ -230,8 +234,9 @@ export const startBot = () => {
 							interaction.editReply(`${bold('Playing')} :notes: ${styleTrack(trackData)}`)
 							session.play(trackData)
 						} else {
+							let index = interaction.options.getInteger('index')
 							interaction.editReply(`:thumbsup: Added ${styleTrack(trackData)} to the queue.`)
-							session.addTrack(trackData)
+							session.addTrack(trackData, index ? --index : undefined)
 						}
 						return
 					} else if (commandName === 'radio') {

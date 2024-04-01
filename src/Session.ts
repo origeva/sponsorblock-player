@@ -149,7 +149,7 @@ export class Session {
 		return this.volume
 	}
 
-	public async addTrack(trackData: TrackData): Promise<PlayInfo> {
+	public async addTrack(trackData: TrackData, index?: number): Promise<PlayInfo> {
 		if (!this.playing) {
 			this.play(trackData)
 			return { track: new Track(trackData), eta: 0 }
@@ -160,7 +160,17 @@ export class Session {
 			track.currentLength -= skipSegments.map((segment) => segment.endTime - segment.startTime).reduce((prev, current) => prev + current)
 		}
 		this.queueTime += track.currentLength
-		this.queue.push(track)
+
+		if (index !== undefined) {
+			if (index < 0) {
+				index = 0
+			} else if (index >= this.queue.length) {
+				index = this.queue.length
+			}
+			this.queue.splice(index, 0, track)
+		} else {
+			this.queue.push(track)
+		}
 		return { track, eta: this.queueTime }
 	}
 
